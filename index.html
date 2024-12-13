@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Пример страницы</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<div class="custom-container">
+  <div class="d-flex justify-content-between align-items-center">
+    <div class="logo">
+      <img src="/images/food-6216-logo.png" alt="Logo" height="150px">
+    </div>
+    <div class="search">
+      <div class="input-group">
+        <input type="text" id="mealSearch" class="form-control search-custom" placeholder="Поиск">
+      </div>
+    </div>
+  </div>
+<!-- это часть где расположен список еды-->
+  <div class="col-md-12" id="mealResults">
+    <div class="food-cards" id="cards">
+
+    </div>
+  </div>
+
+
+<!--  рецепт и описание еды-->
+  <div class="blok" id="block">
+
+  </div>
+
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script src="../../weboriginrestapi/js/script.js"></script>
+</body>
+</html>
