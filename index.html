@@ -1,45 +1,126 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Пример страницы</title>
-  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-  <link rel="stylesheet" href="/css/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Пример страницы</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
 
-<div class="custom-container">
-  <div class="d-flex justify-content-between align-items-center">
-    <div class="logo">
-      <img src="/images/food-6216-logo.png" alt="Logo" height="150px">
+<div id="app" class="custom-container">
+    <div class="d-flex justify-content-between align-items-center">
+        <div class="logo">
+            <img src="/images/food-6216-logo.png" alt="Logo" height="150px">
+        </div>
+        <div class="search">
+            <div class="input-group">
+                <input type="text" v-model="searchQuery" @keydown.enter="fetchMeals" class="form-control search-custom" placeholder="Поиск">
+            </div>
+        </div>
     </div>
-    <div class="search">
-      <div class="input-group">
-        <input type="text" id="mealSearch" class="form-control search-custom" placeholder="Поиск">
-      </div>
+
+    <div class="col-md-12" v-if="meals.length">
+        <div class="food-cards" id="cards">
+            <div class="food-card col-md-4" v-for="meal in meals" :key="meal.idMeal" @click="viewRecipe(meal.idMeal)">
+                <div class="food-card-img">
+                    <img :src="meal.strMealThumb" :alt="meal.strMeal">
+                </div>
+                <div class="food-card-content">
+                    <div class="food-card-title">
+                        <span>{{ meal.strMeal }}</span>
+                    </div>
+                    <div class="food-card-description">
+                        <span>Category: {{ meal.strCategory }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-<!-- это часть где расположен список еды-->
-  <div class="col-md-12" id="mealResults">
-    <div class="food-cards" id="cards">
 
+    <div v-if="selectedMeal" class="blok" id="block">
+        <h3 class="block-title col-md-12">{{ selectedMeal.strMeal }}</h3>
+        <div class="body-container row col-md-12">
+            <div class="left-side col-md-4">
+                <img :src="selectedMeal.strMealThumb" class="photo" :alt="selectedMeal.strMeal">
+            </div>
+            <div class="right-side col-md-6">
+                <h3 class="h3 food-ingr-title">Ingredients</h3>
+                <ul class="modern-list">
+                    <li v-for="ingredient in ingredients" :key="ingredient" class="modern-list-item">{{ ingredient }}</li>
+                </ul>
+            </div>
+        </div>
+
+        <hr class="hr-line">
+
+        <div class="description col-md-12">
+            <div class="description-title">
+                Описание
+            </div>
+            <div class="description-text">
+                {{ selectedMeal.strInstructions }}
+            </div>
+        </div>
     </div>
-  </div>
-
-
-<!--  рецепт и описание еды-->
-  <div class="blok" id="block">
-
-  </div>
-
 </div>
 
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+<script>
+    new Vue({
+        el: "#app",
+        data: {
+            apiURL: "https://www.themealdb.com/api/json/v1/1/",
+            searchQuery: "",
+            meals: [],
+            selectedMeal: null
+        },
+        computed: {
+            ingredients() {
+                if (!this.selectedMeal) return [];
+                const ingredients = [];
+                for (let i = 1; i <= 20; i++) {
+                    const ingredient = this.selectedMeal[`strIngredient${i}`];
+                    const measure = this.selectedMeal[`strMeasure${i}`];
+                    if (ingredient && ingredient.trim()) {
+                        ingredients.push(`${measure} ${ingredient}`);
+                    }
+                }
+                return ingredients;
+            }
+        },
+        methods: {
+            async fetchMeals() {
+                if (!this.searchQuery) {
+                    this.meals = [];
+                    return;
+                }
 
-<script src="/js/script.js"></script>
+                try {
+                    const response = await fetch(`${this.apiURL}search.php?s=${this.searchQuery}`);
+                    const data = await response.json();
+                    this.meals = data.meals || [];
+                    this.selectedMeal = null;
+                } catch (error) {
+                    alert("Ошибка при получении данных. Попробуйте снова.");
+                }
+            },
+            async viewRecipe(mealId) {
+                try {
+                    const response = await fetch(`${this.apiURL}lookup.php?i=${mealId}`);
+                    const data = await response.json();
+                    this.selectedMeal = data.meals[0] || null;
+                    this.meals = [];
+                    this.searchQuery = "";
+                } catch (error) {
+                    alert("Ошибка при получении данных. Попробуйте снова.");
+                }
+            }
+        }
+    });
+</script>
+
 </body>
 </html>
